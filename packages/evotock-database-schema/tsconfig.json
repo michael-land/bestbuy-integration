@@ -1,0 +1,10 @@
+{
+  "extends": ["@tsconfig/node18", "@tsconfig/strictest"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["src"]
+}

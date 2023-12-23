@@ -1,0 +1,41 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "format": {
+      "outputs": []
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    },
+    "deploy": {
+      "cache": false
+    },
+    "codegen": {
+      "dependsOn": ["^codegen"],
+      "cache": false
+    },
+    "@app/serverless#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "main.ts", "functions/**", "tsconfig.json"],
+      "outputs": [".sst/dist/**"]
+    }
+  },
+
+  "globalEnv": ["GITHUB_TOKEN", "NODE_ENV"],
+  "globalDependencies": [".env", "tsconfig.json", "pnpm-lock.yaml"]
+}

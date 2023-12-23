@@ -1,0 +1,14 @@
+diff --git a/dist/latinize.d.ts b/dist/latinize.d.ts
+index 9581ef80262ba44c018a53da9cab3269172f9db6..a64965fbd2c319643de6c0e141096534613d3ee4 100644
+--- a/dist/latinize.d.ts
++++ b/dist/latinize.d.ts
+@@ -1,6 +1,6 @@
+-import { DiacriticOptions } from "./removeDiacritics";
+-import { SymbolOptions } from "./normalizeSymbols";
++import { DiacriticOptions } from './removeDiacritics.js';
++import { SymbolOptions } from './normalizeSymbols.js';
+ export interface LatinizeOptions extends SymbolOptions, DiacriticOptions {
+-    symbols?: boolean;
++  symbols?: boolean;
+ }
+ export declare function latinize(str: string, options: LatinizeOptions): string;

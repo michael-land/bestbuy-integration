@@ -1,0 +1,44 @@
+{
+  "name": "@evotock/database-schema",
+  "version": "0.0.4",
+  "author": {
+    "name": "Michael Li",
+    "email": "xiaoyu.tamu@gmail.com",
+    "url": "https://github.com/xiaoyu-tamu"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "clean": "rm -rf .turbo dist tsconfig.tsbuildinfo node_modules",
+    "codegen": "kysely-codegen --include-pattern=public.* --camel-case --type-only-imports --out-file ./src/typescript.ts && kysely-zod && prettier --write src",
+    "format": "prettier --write \"src/**/*.{js,ts,gql,yaml,yml,md,json}\"",
+    "lint": "eslint \"src/**/*.{ts,js}\" --fix",
+    "seed": "tsx seed.ts"
+  },
+  "dependencies": {
+    "modern-diacritics": "2.3.1",
+    "zod": "3.22.4"
+  },
+  "devDependencies": {
+    "kysely": "0.26.3",
+    "kysely-codegen": "0.11.0",
+    "kysely-zod": "1.0.0-beta.16",
+    "pg": "8.11.3",
+    "postgres-interval": "4.0.1"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "registry": "https://npm.pkg.github.com/",
+    "types": "./dist/index.d.ts"
+  }
+}

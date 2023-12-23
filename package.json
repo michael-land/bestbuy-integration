@@ -1,0 +1,70 @@
+{
+  "name": "backend",
+  "version": "1.149.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michael-land/backend-should-be-final.git"
+  },
+  "author": {
+    "name": "Michael Li",
+    "email": "xiaoyu.tamu@gmail.com",
+    "url": "https://michael.land"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "turbo run clean && rimraf node_modules pnpm-lock.yaml",
+    "codegen": "turbo run codegen",
+    "db:apply": "hasura migrate apply --database-name default --project services/hasura",
+    "db:reset": "hasura migrate apply --database-name default --project services/hasura --down 100",
+    "db:seed": "hasura seed apply --database-name default --project services/hasura",
+    "dependency:upgrade": "npx npm-check-updates -u",
+    "dev": "turbo run dev --filter=app",
+    "format": "turbo run format",
+    "hasura:database:push": "hasura --project services/hasura migrate apply",
+    "hasura:metadata:pull": "hasura --project services/hasura metadata export",
+    "hasura:metadata:push": "hasura --project services/hasura metadata apply",
+    "lint": "turbo run lint",
+    "prepare": "is-ci || is-docker || pnpm exec husky install",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "18.4.3",
+    "@commitlint/config-conventional": "18.4.3",
+    "@commitlint/lint": "18.4.3",
+    "@tsconfig/node18": "18.2.2",
+    "@tsconfig/strictest": "2.0.2",
+    "@types/eslint": "8.56.0",
+    "@types/node": "20.10.5",
+    "@typescript-eslint/eslint-plugin": "6.15.0",
+    "@typescript-eslint/parser": "6.15.0",
+    "dotenv": "16.3.1",
+    "eslint": "8.56.0",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-turbo": "1.11.2",
+    "husky": "8.0.3",
+    "is-ci": "3.0.1",
+    "is-docker": "3.0.0",
+    "lint-staged": "15.2.0",
+    "prettier": "3.1.1",
+    "prettier-plugin-organize-imports": "3.2.4",
+    "prettier-plugin-packagejson": "2.4.7",
+    "rimraf": "5.0.5",
+    "tsx": "4.7.0",
+    "turbo": "1.11.2",
+    "typescript": "5.3.3"
+  },
+  "packageManager": "pnpm@8.9.0",
+  "engines": {
+    "node": "20.x"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "modern-diacritics@2.3.1": "patches/modern-diacritics@2.3.1.patch"
+    }
+  }
+}

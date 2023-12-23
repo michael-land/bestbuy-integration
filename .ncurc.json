@@ -1,0 +1,6 @@
+{
+  "deep": true,
+  "cache": true,
+  "dep": ["dev", "optional", "peer", "prod"],
+  "reject": ["aws-cdk-lib", "constructs"]
+}

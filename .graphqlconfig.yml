@@ -1,0 +1,4 @@
+projects:
+  app:
+    schemaPath: packages/evotock-sdk-schema/schema.graphql
+    includes: ['packages/evotock-sdk/document/*.{graphql,gql}']

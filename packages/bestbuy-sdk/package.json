@@ -1,0 +1,23 @@
+{
+  "name": "@bestbuy/sdk",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo dist tsconfig.tsbuildinfo node_modules",
+    "format": "prettier --write \"src/**/*.{js,ts,gql,yaml,yml,md,json}\"",
+    "lint": "eslint \"src/**/*.{ts,js}\" --fix"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "type-fest": "4.8.3"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
