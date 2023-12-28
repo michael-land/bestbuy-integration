@@ -15,6 +15,7 @@ export class CatalogGetJob extends Job<CatalogGetJobInput, CatalogGetJobOutput, 
 export class CatalogGetQueue extends Queue<CatalogGetJobInput, CatalogGetJobOutput, CatalogGetJobName> {}
 
 export const CatalogGetQueueOptions: QueueOptions = {
+  prefix: 'bestbuy',
   defaultJobOptions: {
     attempts: 3,
     backoff: {
@@ -28,6 +29,7 @@ export const CatalogGetQueueOptions: QueueOptions = {
 
 export class CatalogGetWorker extends Worker<CatalogGetJobInput, CatalogGetJobOutput, CatalogGetJobName> {}
 export const CatalogGetWorkerOptions: WorkerOptions = {
+  prefix: 'bestbuy',
   limiter: { duration: seconds(1), max: 1 },
   concurrency: 2,
 };
