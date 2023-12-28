@@ -33,7 +33,7 @@ export class CatalogService {
         .selectAll()
         .execute();
 
-      this.#logger.debug(`${marketplace.name} ${catalogs.length}`);
+      this.#logger.log(`${marketplace.name} ${catalogs.length}`);
 
       for (const chunked of split(catalogs, 100)) {
         await this.catalogGetQueue.addBulk(
