@@ -1,9 +1,9 @@
 import { type SSTConfig } from 'sst';
-import { Bestbuy } from './main.js';
+import { scheduler } from './main.js';
 
 export default {
   config: async () => ({
-    name: 'evotock',
+    name: 'bestbuy',
     region: 'us-east-1',
   }),
 
@@ -14,6 +14,6 @@ export default {
       app.setDefaultRemovalPolicy('destroy');
     }
 
-    app.stack(Bestbuy, { stackName: `${app.name}-${app.stage}-bestbuy` });
+    app.stack(scheduler, { stackName: `${app.name}-${app.stage}-scheduler` });
   },
 } satisfies SSTConfig;

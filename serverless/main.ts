@@ -15,7 +15,7 @@ const crons: {
   },
 ];
 
-export async function Bestbuy({ stack }: StackContext) {
+export async function scheduler({ stack }: StackContext) {
   const EVOTOCK_GRAPHQL_ENDPOINT = new Config.Secret(stack, 'EVOTOCK_GRAPHQL_ENDPOINT');
   const EVOTOCK_GRAPHQL_TOKEN = new Config.Secret(stack, 'EVOTOCK_GRAPHQL_TOKEN');
 
