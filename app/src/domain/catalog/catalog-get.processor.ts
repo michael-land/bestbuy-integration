@@ -45,6 +45,8 @@ export class CatalogGetProcessor extends WorkerHost<
   }
 
   override async process(job: CatalogGetJob) {
+    this.#logger.log(`processing bestbuy catalog get job ${job.data.sku}`);
+
     try {
       const catalog = await this.database
         .selectFrom('catalog')
