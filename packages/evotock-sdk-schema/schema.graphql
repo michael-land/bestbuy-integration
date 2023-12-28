@@ -1,0 +1,12 @@
+input BestbuyCatalogRefreshManyInput {
+  marketplaceIds: [String!]
+  skus: [String!]
+}
+
+type Mutation {
+  bestbuyCatalogRefreshMany(input: BestbuyCatalogRefreshManyInput!): Boolean!
+}
+
+type Query {
+  health: String!
+}

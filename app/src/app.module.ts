@@ -13,6 +13,7 @@ import { AppExceptionFilter } from './app-exception.filter.js';
 import { AppThrottlerGuard } from './app-throttle.guard.js';
 import { AuthGuard } from './domain/auth/auth.guard.js';
 import { AuthModule } from './domain/auth/auth.module.js';
+import { CatalogModule } from './domain/catalog/catalog.module.js';
 import { HealthModule } from './domain/health/health.module.js';
 
 @Module({
@@ -84,6 +85,7 @@ import { HealthModule } from './domain/health/health.module.js';
 
     AuthModule,
     HealthModule,
+    CatalogModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AppThrottlerGuard },

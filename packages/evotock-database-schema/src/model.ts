@@ -404,6 +404,17 @@ export const CatalogStatisticSchema = z.object({
   numFeatureOffer: scalar.int8.nullable().optional(),
   numRegularOffer: scalar.int8.nullable().optional(),
 });
+export const CatalogTrackerSchema = z.object({
+  id: scalar.uuid.optional(),
+  createdAt: scalar.timestamptz.optional(),
+  updatedAt: scalar.timestamptz.optional(),
+  deletedAt: scalar.timestamptz.nullable().optional(),
+  noticedAt: scalar.timestamptz.nullable().optional(),
+  teamId: scalar.uuid,
+  catalogId: scalar.uuid,
+  price: scalar.int4.nullable().optional(),
+  quantity: scalar.int4.nullable().optional(),
+});
 export const CountrySchema = z.object({
   id: scalar.bpchar,
   code: scalar.bpchar,
@@ -687,6 +698,7 @@ export type CatalogImageSchema = z.TypeOf<typeof CatalogImageSchema>;
 export type CatalogOfferSchema = z.TypeOf<typeof CatalogOfferSchema>;
 export type CatalogPriceSchema = z.TypeOf<typeof CatalogPriceSchema>;
 export type CatalogStatisticSchema = z.TypeOf<typeof CatalogStatisticSchema>;
+export type CatalogTrackerSchema = z.TypeOf<typeof CatalogTrackerSchema>;
 export type CountrySchema = z.TypeOf<typeof CountrySchema>;
 export type CurrencySchema = z.TypeOf<typeof CurrencySchema>;
 export type InventoryItemSchema = z.TypeOf<typeof InventoryItemSchema>;

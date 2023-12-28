@@ -3,8 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "exactOptionalPropertyTypes": false,
-    "verbatimModuleSyntax": true
+    "declaration": true
   },
-  "include": ["src", "types/**/*"]
+  "include": ["src"]
 }

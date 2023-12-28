@@ -221,6 +221,18 @@ export interface CatalogStatistic {
   numRegularOffer: Int8 | null;
 }
 
+export interface CatalogTracker {
+  catalogId: string;
+  createdAt: Generated<Timestamp>;
+  deletedAt: Timestamp | null;
+  id: Generated<string>;
+  noticedAt: Timestamp | null;
+  price: number | null;
+  quantity: number | null;
+  teamId: string;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface Country {
   capital: string | null;
   code: string;
@@ -529,6 +541,7 @@ export interface DB {
   catalogOffer: CatalogOffer;
   catalogPrice: CatalogPrice;
   catalogStatistic: CatalogStatistic;
+  catalogTracker: CatalogTracker;
   country: Country;
   currency: Currency;
   inventoryItem: InventoryItem;

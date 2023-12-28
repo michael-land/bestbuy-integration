@@ -1,0 +1,13 @@
+{
+  "extends": ["@tsconfig/node18", "@tsconfig/strictest"],
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
+    "baseUrl": ".",
+    "paths": {
+      "#/*": ["src/*"],
+      "@evotock/sdk": ["../packages/evotock-sdk/src/index.ts"],
+      "@evotock/sdk-schema": ["../packages/evotock-sdk-schema/src/index.ts"]
+    }
+  },
+  "include": ["src", "functions", "crons", "sst.config.ts", "sst-env.d.ts", "types"]
+}

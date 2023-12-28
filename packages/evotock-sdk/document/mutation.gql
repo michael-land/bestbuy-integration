@@ -1,0 +1,3 @@
+mutation bestbuyCatalogRefreshMany($input: BestbuyCatalogRefreshManyInput!) {
+  bestbuyCatalogRefreshMany(input: $input)
+}

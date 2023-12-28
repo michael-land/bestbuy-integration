@@ -1,1 +1,2 @@
-export const name = 'bestbuy sdk';
+export * from './sdk.js';
+export * from './types.js';

@@ -13,7 +13,9 @@
     "format": "prettier --write \"src/**/*.{js,ts,gql,yaml,yml,md,json}\"",
     "lint": "eslint \"src/**/*.{ts,js}\" --fix"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ky": "1.1.3"
+  },
   "devDependencies": {
     "type-fest": "4.8.3"
   },

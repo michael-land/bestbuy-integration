@@ -43,6 +43,7 @@
     "@swc/helpers": "0.5.3",
     "bullmq": "4.17.0",
     "date-fns": "3.0.6",
+    "decimal.js": "10.4.3",
     "graphql": "16.8.1",
     "graphql-scalars": "1.22.4",
     "nestjs-pino": "3.5.0",
