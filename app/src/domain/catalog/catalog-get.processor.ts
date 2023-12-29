@@ -180,7 +180,7 @@ export class CatalogGetProcessor extends WorkerHost<
               },
             },
             params: {
-              receive_id_type: 'open_id',
+              receive_id_type: 'chat_id',
             },
           });
 
