@@ -174,7 +174,7 @@ export class CatalogGetProcessor extends WorkerHost<
               template_id: 'ctp_AAyt469SXpGG',
               template_variable: {
                 product_name: catalog.name,
-                product_price: String(product.salePrice ?? product.regularPrice),
+                product_price: `$${product.salePrice ?? product.regularPrice}`,
                 product_link: catalog.externalUrl,
                 platform_name: 'Bestbuy',
               },
