@@ -72,12 +72,9 @@ export class CatalogGetProcessor extends WorkerHost<
             .updateTable('catalog')
             .where('id', '=', catalog.id)
             .set({
-              modelNumber: catalog?.modelNumber,
               name: catalog.name,
-              manufacturer: catalog.manufacturer,
               packageQuantity: 1,
               category: product.class,
-              brand: catalog.manufacturer,
               status: 'ACTIVE',
               type: product.type === 'Bundle' ? 'BUNDLE' : catalog.type ? 'STANDARD' : 'UNKNOWN',
             })

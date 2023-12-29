@@ -137,18 +137,14 @@ export interface Automation {
 }
 
 export interface Catalog {
-  brand: string | null;
   category: string | null;
   createdAt: Generated<Timestamp>;
   externalId: string;
   externalUrl: string;
   id: Generated<string>;
-  manufacturer: string | null;
   marketplaceId: string;
-  modelNumber: string | null;
   name: string;
   packageQuantity: number | null;
-  partNumber: string | null;
   status: CatalogStatus;
   type: CatalogType;
   updatedAt: Generated<Timestamp>;

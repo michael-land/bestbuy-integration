@@ -335,10 +335,6 @@ export const CatalogSchema = z.object({
   name: scalar.text,
   type: scalar.catalog_type,
   status: scalar.catalog_status,
-  brand: scalar.text.nullable().optional(),
-  manufacturer: scalar.text.nullable().optional(),
-  modelNumber: scalar.text.nullable().optional(),
-  partNumber: scalar.text.nullable().optional(),
   packageQuantity: scalar.int4.nullable().optional(),
   category: scalar.text.nullable().optional(),
 });
