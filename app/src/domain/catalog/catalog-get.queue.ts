@@ -23,7 +23,6 @@ export const CatalogGetQueueOptions: QueueOptions = {
       delay: 3000,
     },
     removeOnComplete: true,
-    removeOnFail: 20,
   },
 };
 

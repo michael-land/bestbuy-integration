@@ -2,9 +2,11 @@ import type { DB, Insertable, Selectable } from '@evotock/database-schema';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { UnrecoverableError, Worker } from 'bullmq';
+import { isToday } from 'date-fns';
 import { Decimal } from 'decimal.js';
 import { BestbuyApi } from '../../bestbuy.api.js';
 import { DatabaseService } from '../../database/database.service.js';
+import { LarkSdk } from '../../lark.sdk.js';
 import {
   CatalogGetJob,
   CatalogGetQueue,
@@ -22,7 +24,8 @@ export class CatalogGetProcessor extends WorkerHost<
 
   constructor(
     private readonly database: DatabaseService,
-    private readonly sdk: BestbuyApi
+    private readonly bestbuy: BestbuyApi,
+    private readonly lark: LarkSdk
   ) {
     super();
   }
@@ -55,7 +58,7 @@ export class CatalogGetProcessor extends WorkerHost<
         .selectAll()
         .executeTakeFirstOrThrow();
 
-      const data = await this.sdk.product.search(`sku=${job.data.sku}`);
+      const data = await this.bestbuy.product.search(`sku=${job.data.sku}`);
       const product = data.products.at(0);
       if (!product) {
         await this.database
@@ -153,6 +156,42 @@ export class CatalogGetProcessor extends WorkerHost<
               .execute();
           }
         });
+
+        const tracker = await this.database
+          .selectFrom('catalogTracker')
+          .where('catalogId', '=', catalog.id)
+          .where('teamId', '=', 'df379e65-b542-4c78-a6d4-cd39f9608bef')
+          .selectAll()
+          .executeTakeFirstOrThrow();
+
+        const itemPrice = new Decimal(product.salePrice ?? product.regularPrice).times(100).round().toNumber();
+        if ((!tracker.noticedAt || !isToday(tracker.noticedAt)) && tracker.price && itemPrice < tracker.price) {
+          console.log(`${product.sku} is available to purchase for ${itemPrice}`);
+
+          const response = await this.lark.im.message.createByCard({
+            data: {
+              receive_id: 'oc_4e496062eb44f39ae964ec42da81fecb',
+              template_id: 'ctp_AAyt469SXpGG',
+              template_variable: {
+                product_name: catalog.name,
+                product_price: String(product.salePrice ?? product.regularPrice),
+                product_link: catalog.externalUrl,
+                platform_name: 'Bestbuy',
+              },
+            },
+            params: {
+              receive_id_type: 'open_id',
+            },
+          });
+
+          if (response.code === 0) {
+            await this.database
+              .updateTable('catalogTracker')
+              .where('id', '=', tracker.id)
+              .set({ noticedAt: new Date() })
+              .executeTakeFirstOrThrow();
+          }
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
