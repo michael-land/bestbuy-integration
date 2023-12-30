@@ -223,8 +223,10 @@ export interface CatalogTracker {
   deletedAt: Timestamp | null;
   id: Generated<string>;
   noticedAt: Timestamp | null;
-  price: number | null;
-  quantity: number | null;
+  priceMax: number | null;
+  priceMin: number | null;
+  quantityMax: number | null;
+  quantityMin: number | null;
   teamId: string;
   updatedAt: Generated<Timestamp>;
 }

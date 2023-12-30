@@ -68,17 +68,21 @@ export class CatalogGetProcessor extends WorkerHost<
           .executeTakeFirstOrThrow();
       } else {
         await this.database.transaction().execute(async (transaction) => {
-          await transaction
-            .updateTable('catalog')
-            .where('id', '=', catalog.id)
-            .set({
-              name: catalog.name,
-              packageQuantity: 1,
-              category: product.class,
-              status: 'ACTIVE',
-              type: product.type === 'Bundle' ? 'BUNDLE' : catalog.type ? 'STANDARD' : 'UNKNOWN',
-            })
-            .executeTakeFirstOrThrow();
+          if (catalog.name !== product.name && product.class !== catalog.category) {
+            await transaction
+              .updateTable('catalog')
+              .where('id', '=', catalog.id)
+              .set({
+                name: product.name,
+                packageQuantity: 1,
+                category: product.class,
+                status: 'ACTIVE',
+                createdAt: product.startDate,
+                updatedAt: new Date(),
+                type: product.type === 'Bundle' ? 'BUNDLE' : catalog.type ? 'STANDARD' : 'UNKNOWN',
+              })
+              .executeTakeFirstOrThrow();
+          }
 
           const nextCatalogImages = product.images.map((image, imageIdx) => ({
             catalogId: catalog.id,
@@ -162,7 +166,7 @@ export class CatalogGetProcessor extends WorkerHost<
           .executeTakeFirstOrThrow();
 
         const itemPrice = new Decimal(product.salePrice ?? product.regularPrice).times(100).round().toNumber();
-        if ((!tracker.noticedAt || !isToday(tracker.noticedAt)) && tracker.price && itemPrice < tracker.price) {
+        if ((!tracker.noticedAt || !isToday(tracker.noticedAt)) && tracker.priceMax && itemPrice < tracker.priceMax) {
           console.log(`${product.sku} is available to purchase for ${itemPrice}`);
 
           const response = await this.lark.im.message.createByCard({

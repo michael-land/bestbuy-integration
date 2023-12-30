@@ -408,8 +408,10 @@ export const CatalogTrackerSchema = z.object({
   noticedAt: scalar.timestamptz.nullable().optional(),
   teamId: scalar.uuid,
   catalogId: scalar.uuid,
-  price: scalar.int4.nullable().optional(),
-  quantity: scalar.int4.nullable().optional(),
+  priceMin: scalar.int4.nullable().optional(),
+  priceMax: scalar.int4.nullable().optional(),
+  quantityMin: scalar.int4.nullable().optional(),
+  quantityMax: scalar.int4.nullable().optional(),
 });
 export const CountrySchema = z.object({
   id: scalar.bpchar,

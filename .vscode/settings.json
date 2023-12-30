@@ -1,6 +1,6 @@
 {
   "typescript.preferences.importModuleSpecifierEnding": "js",
   "yaml.schemas": {
-    "https://json.schemastore.org/dependabot-2.0.json": "file:///Users/michael/work/byteroam/backend/.github/dependabot.yml"
+    "https://json.schemastore.org/dependabot-2.0.json": "file:///Users/michael/work/evotock/backend/.github/dependabot.yml"
   }
 }
