@@ -20,12 +20,12 @@ export class CatalogService {
       .selectFrom('marketplace')
       .where('platformId', '=', 'e55e4952-6f4e-4f5b-9c77-9469ac766179')
       .selectAll();
+
     if (input.marketplaceIds) {
       marketplacesQuery = marketplacesQuery.where('externalId', 'in', input.marketplaceIds);
     }
-    const marketplaces = await marketplacesQuery.execute();
 
-    for (const marketplace of marketplaces) {
+    for (const marketplace of await marketplacesQuery.execute()) {
       const catalogs = await this.database
         .selectFrom('catalog')
         .select(['marketplaceId', 'externalId'])

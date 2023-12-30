@@ -60,7 +60,7 @@ export class CatalogGetProcessor extends WorkerHost<
       const data = await this.bestbuy.product.search(`sku=${job.data.sku}`);
 
       const product = data.products.at(0);
-      console.log(product?.sku);
+
       if (!product) {
         await this.database
           .updateTable('catalog')

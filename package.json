@@ -61,10 +61,5 @@
   },
   "publishConfig": {
     "access": "restricted"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "modern-diacritics@2.3.1": "patches/modern-diacritics@2.3.1.patch"
-    }
   }
 }

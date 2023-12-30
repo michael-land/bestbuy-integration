@@ -9,7 +9,13 @@ import { CatalogResolver } from './catalog.resolver.js';
 import { CatalogService } from './catalog.service.js';
 
 @Module({
-  imports: [DatabaseModule, BullModule.registerQueue({ name: CatalogGetQueue.name, ...CatalogGetQueueOptions })],
+  imports: [
+    DatabaseModule,
+    BullModule.registerQueue({
+      name: CatalogGetQueue.name,
+      ...CatalogGetQueueOptions,
+    }),
+  ],
   providers: [CatalogService, CatalogResolver, BestbuyApi, CatalogGetProcessor, LarkSdk],
 })
 export class CatalogModule {}
