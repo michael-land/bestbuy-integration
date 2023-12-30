@@ -23,7 +23,7 @@
     "@graphql-codegen/typescript-generic-sdk": "4.0.0",
     "@graphql-codegen/typescript-operations": "4.0.1",
     "@types/aws-lambda": "8.10.130",
-    "aws-cdk-lib": "2.101.1",
+    "aws-cdk-lib": "2.110.1",
     "constructs": "10.2.69",
     "date-fns": "3.0.6",
     "graphql": "16.8.1",

@@ -1,9 +1,9 @@
-import { EvotockDatabase } from '@evotock/database';
+import { Database } from '@byteroam/database';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class DatabaseService extends EvotockDatabase {
+export class DatabaseService extends Database {
   constructor(readonly config: ConfigService) {
     super({
       config: {

@@ -1,4 +1,4 @@
-import { seconds } from '@evotock/utilities';
+import { seconds } from '@byteroam/utilities';
 import { Job, Queue, Worker, type QueueOptions, type WorkerOptions } from 'bullmq';
 import type { LiteralUnion } from 'type-fest';
 

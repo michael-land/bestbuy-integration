@@ -1,4 +1,9 @@
-import type { DB, Insertable, Selectable } from '@evotock/database-schema';
+import {
+  CatalogImagesMergeCommand,
+  CatalogOffersMergeCommand,
+  CatalogTrackerSetNoticedAtCommand,
+} from '@byteroam/database';
+import type { DB, Insertable } from '@byteroam/database-schema';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { UnrecoverableError, Worker } from 'bullmq';
@@ -51,60 +56,73 @@ export class CatalogGetProcessor extends WorkerHost<
     this.#logger.log(`processing bestbuy catalog get job ${job.data.sku}`);
 
     try {
-      const catalog = await this.database
-        .selectFrom('catalog')
-        .where('marketplaceId', '=', 'db9a93b2-e306-4910-93ab-4a467ea87b60')
-        .where('externalId', '=', job.data.sku)
-        .selectAll()
-        .executeTakeFirstOrThrow();
-
       const data = await this.bestbuy.product.search(`sku=${job.data.sku}`);
       const product = data.products.at(0);
       if (!product) {
         await this.database
           .updateTable('catalog')
-          .where('id', '=', catalog.id)
+          .where('externalId', '=', job.data.sku)
+          .where('marketplaceId', '=', 'db9a93b2-e306-4910-93ab-4a467ea87b60')
           .set({ status: 'DELETED' })
           .executeTakeFirstOrThrow();
       } else {
+        const prevCatalog = await this.database
+          .selectFrom('catalog')
+          .where('marketplaceId', '=', 'db9a93b2-e306-4910-93ab-4a467ea87b60')
+          .where('externalId', '=', job.data.sku)
+          .selectAll()
+          .executeTakeFirstOrThrow();
+
+        const nextCatalog = {
+          // immutable
+          externalId: `${product.sku}`,
+          externalUrl: `https://www.bestbuy.com/site/${product.sku}.p`,
+          marketplaceId: 'db9a93b2-e306-4910-93ab-4a467ea87b60',
+          packageQuantity: 1,
+          status: 'ACTIVE',
+          // updatable
+          name: product.name,
+          category: product.class,
+          createdAt: product.startDate,
+          updatedAt: new Date(),
+          type: product.type === 'Bundle' ? 'BUNDLE' : prevCatalog.type ? 'STANDARD' : 'UNKNOWN',
+        } satisfies Insertable<DB['catalog']>;
+
         await this.database.transaction().execute(async (transaction) => {
-          if (catalog.name !== product.name || product.class !== catalog.category) {
+          if (prevCatalog.name !== nextCatalog.name || nextCatalog.category !== prevCatalog.category) {
             await transaction
               .updateTable('catalog')
-              .where('id', '=', catalog.id)
-              .set({
-                name: product.name,
-                packageQuantity: 1,
-                category: product.class,
-                status: 'ACTIVE',
-                createdAt: product.startDate,
-                updatedAt: new Date(),
-                type: product.type === 'Bundle' ? 'BUNDLE' : catalog.type ? 'STANDARD' : 'UNKNOWN',
-              })
+              .where('id', '=', prevCatalog.id)
+              .set(nextCatalog)
               .executeTakeFirstOrThrow();
           }
 
+          const prevCatalogImages = await transaction
+            .selectFrom('catalogImage')
+            .selectAll()
+            .where('catalogId', '=', prevCatalog.id)
+            .execute();
+
           const nextCatalogImages = product.images.map((image, imageIdx) => ({
-            catalogId: catalog.id,
+            catalogId: prevCatalog.id,
             createdAt: new Date(),
             updatedAt: new Date(),
             url: image.href,
             height: Number(image.height),
             width: Number(image.width),
             position: imageIdx,
-          }));
+          })) satisfies Insertable<DB['catalogImage']>[];
 
-          await transaction
-            .insertInto('catalogImage')
-            .values(nextCatalogImages)
-            .onConflict((eb) => eb.doNothing())
-            .execute();
+          await new CatalogImagesMergeCommand({
+            nextCatalogImages,
+            prevCatalogImages,
+          }).execute(transaction);
 
           const prevCatalogOffers = await transaction
             .selectFrom('catalogOffer')
             .selectAll()
             .where('deletedAt', 'is', null)
-            .where('catalogId', '=', catalog.id)
+            .where('catalogId', '=', prevCatalog.id)
             .where('customerType', '=', 'CONSUMER')
             .where('condition', '=', 'NEW')
             .execute();
@@ -113,54 +131,42 @@ export class CatalogGetProcessor extends WorkerHost<
             product.inStoreAvailability || product.onlineAvailability
               ? [
                   {
-                    catalogId: catalog.id,
+                    // immutable
+                    catalogId: prevCatalog.id,
+                    condition: 'NEW',
                     createdAt: new Date(),
+                    customerType: 'CONSUMER',
+                    fulfillmentChannel: 'PLATFORM',
+                    fulfillmentCountry: 'USA',
+                    fulfillmentHourMax: null,
+                    fulfillmentHourMin: null,
+                    fulfillmentProvince: null,
+                    merchantId: 'ac0cb587-8525-4161-a635-d67b268eba94',
+                    position: 0,
+                    prime: 'NONE',
+                    restockAt: null,
+                    subcondition: 'NEW',
+                    type: 'REGULAR',
                     updatedAt: new Date(),
+
+                    // updatable
                     itemPrice: new Decimal(product.salePrice ?? product.regularPrice).times(100).round().toNumber(),
                     shipPrice: product.shippingLevelsOfService.length
                       ? new Decimal(product.shippingCost ?? 0).times(100).round().toNumber()
                       : 0,
-                    customerType: 'CONSUMER',
-                    condition: 'NEW',
-                    type: 'REGULAR',
-                    fulfillmentChannel: 'PLATFORM',
-                    merchantId: 'ac0cb587-8525-4161-a635-d67b268eba94',
-                    position: 0,
-                    prime: 'NONE',
-                    fulfillmentHourMin: null,
-                    fulfillmentHourMax: null,
-                    fulfillmentCountry: 'USA',
-                    subcondition: 'NEW',
-                    restockAt: null,
-                    fulfillmentProvince: null,
                   },
                 ]
               : [];
 
-          const removedOffers = findRemovedCatalogOffers({ prevCatalogOffers, nextCatalogOffers });
-          const unsavedOffers = findUnsavedCatalogOffers({ prevCatalogOffers, nextCatalogOffers });
-
-          if (removedOffers.length) {
-            await transaction
-              .updateTable('catalogOffer')
-              .set({ deletedAt: new Date() })
-              .where('id', 'in', removedOffers.map((offer) => offer.id).filter(Boolean))
-              .execute();
-          }
-
-          if (unsavedOffers.length) {
-            await transaction
-              .insertInto('catalogOffer')
-              .values(unsavedOffers)
-              .onConflict((qb) => qb.doNothing())
-              .returning('id')
-              .execute();
-          }
+          await new CatalogOffersMergeCommand({
+            prevCatalogOffers,
+            nextCatalogOffers,
+          }).execute(transaction);
         });
 
         const tracker = await this.database
           .selectFrom('catalogTracker')
-          .where('catalogId', '=', catalog.id)
+          .where('catalogId', '=', prevCatalog.id)
           .where('teamId', '=', 'df379e65-b542-4c78-a6d4-cd39f9608bef')
           .selectAll()
           .executeTakeFirstOrThrow();
@@ -174,9 +180,9 @@ export class CatalogGetProcessor extends WorkerHost<
               receive_id: 'oc_4e496062eb44f39ae964ec42da81fecb',
               template_id: 'ctp_AAyt469SXpGG',
               template_variable: {
-                product_name: catalog.name,
+                product_name: prevCatalog.name,
                 product_price: `$${product.salePrice ?? product.regularPrice}`,
-                product_link: catalog.externalUrl,
+                product_link: prevCatalog.externalUrl,
                 platform_name: 'Bestbuy',
               },
             },
@@ -186,11 +192,9 @@ export class CatalogGetProcessor extends WorkerHost<
           });
 
           if (response.code === 0) {
-            await this.database
-              .updateTable('catalogTracker')
-              .where('id', '=', tracker.id)
-              .set({ noticedAt: new Date() })
-              .executeTakeFirstOrThrow();
+            await new CatalogTrackerSetNoticedAtCommand({
+              id: tracker.id,
+            }).execute(this.database);
           }
         }
       }
@@ -202,72 +206,4 @@ export class CatalogGetProcessor extends WorkerHost<
       }
     }
   }
-}
-
-function findUnsavedCatalogOffers({
-  nextCatalogOffers,
-  prevCatalogOffers,
-}: {
-  prevCatalogOffers: Selectable<DB['catalogOffer']>[];
-  nextCatalogOffers: Insertable<DB['catalogOffer']>[];
-}): Insertable<DB['catalogOffer']>[] {
-  return nextCatalogOffers.filter(
-    (nextCatalogOffer) =>
-      !prevCatalogOffers.some((prevCatalogOffer) => {
-        if (!nextCatalogOffer.createdAt) return false;
-
-        return (
-          prevCatalogOffer.merchantId === nextCatalogOffer.merchantId &&
-          prevCatalogOffer.catalogId === nextCatalogOffer.catalogId &&
-          prevCatalogOffer.customerType === nextCatalogOffer.customerType &&
-          prevCatalogOffer.condition === nextCatalogOffer.condition &&
-          prevCatalogOffer.subcondition === nextCatalogOffer.subcondition &&
-          prevCatalogOffer.fulfillmentChannel === nextCatalogOffer.fulfillmentChannel &&
-          prevCatalogOffer.itemPrice === nextCatalogOffer.itemPrice &&
-          prevCatalogOffer.shipPrice === nextCatalogOffer.shipPrice &&
-          prevCatalogOffer.type === nextCatalogOffer.type &&
-          prevCatalogOffer.position === nextCatalogOffer.position &&
-          prevCatalogOffer.prime === nextCatalogOffer.prime &&
-          prevCatalogOffer.fulfillmentCountry === nextCatalogOffer.fulfillmentCountry &&
-          prevCatalogOffer.fulfillmentProvince === nextCatalogOffer.fulfillmentProvince &&
-          prevCatalogOffer.fulfillmentHourMin === nextCatalogOffer.fulfillmentHourMin &&
-          prevCatalogOffer.fulfillmentHourMax === nextCatalogOffer.fulfillmentHourMax
-        );
-      })
-  );
-}
-
-function findRemovedCatalogOffers({
-  nextCatalogOffers,
-  prevCatalogOffers,
-}: {
-  prevCatalogOffers: Selectable<DB['catalogOffer']>[];
-  nextCatalogOffers: Insertable<DB['catalogOffer']>[];
-}) {
-  return prevCatalogOffers.filter((prevCatalogOffer) => {
-    const nextCatalogOffer = nextCatalogOffers.find(
-      (nextCatalogOffer) =>
-        prevCatalogOffer.merchantId === nextCatalogOffer.merchantId &&
-        prevCatalogOffer.catalogId === nextCatalogOffer.catalogId &&
-        prevCatalogOffer.condition === nextCatalogOffer.condition &&
-        prevCatalogOffer.customerType === nextCatalogOffer.customerType &&
-        prevCatalogOffer.subcondition === nextCatalogOffer.subcondition &&
-        prevCatalogOffer.fulfillmentChannel === nextCatalogOffer.fulfillmentChannel &&
-        prevCatalogOffer.position === nextCatalogOffer.position &&
-        prevCatalogOffer.itemPrice === nextCatalogOffer.itemPrice &&
-        prevCatalogOffer.shipPrice === nextCatalogOffer.shipPrice &&
-        prevCatalogOffer.type === nextCatalogOffer.type
-    );
-
-    if (!nextCatalogOffer) return true;
-
-    return (
-      prevCatalogOffer.fulfillmentCountry !== nextCatalogOffer.fulfillmentCountry ||
-      prevCatalogOffer.fulfillmentProvince !== nextCatalogOffer.fulfillmentProvince ||
-      prevCatalogOffer.fulfillmentHourMin !== nextCatalogOffer.fulfillmentHourMin ||
-      prevCatalogOffer.fulfillmentHourMax !== nextCatalogOffer.fulfillmentHourMax ||
-      prevCatalogOffer.prime !== nextCatalogOffer.prime ||
-      prevCatalogOffer.position !== nextCatalogOffer.position
-    );
-  });
 }

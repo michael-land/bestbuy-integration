@@ -1,4 +1,4 @@
-import { split } from '@evotock/utilities';
+import { split } from '@byteroam/utilities';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service.js';

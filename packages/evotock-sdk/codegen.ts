@@ -2,7 +2,7 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  schema: './node_modules/@evotock/sdk-schema/schema.graphql',
+  schema: './node_modules/@byteroam/sdk-schema/schema.graphql',
   documents: ['document/**/*.gql'],
 
   hooks: {
