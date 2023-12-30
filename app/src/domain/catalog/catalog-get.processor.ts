@@ -68,7 +68,7 @@ export class CatalogGetProcessor extends WorkerHost<
           .executeTakeFirstOrThrow();
       } else {
         await this.database.transaction().execute(async (transaction) => {
-          if (catalog.name !== product.name && product.class !== catalog.category) {
+          if (catalog.name !== product.name || product.class !== catalog.category) {
             await transaction
               .updateTable('catalog')
               .where('id', '=', catalog.id)
