@@ -1,4 +1,4 @@
-import { seconds } from '@byteroam/utilities';
+import { seconds } from '@nestjs/throttler';
 import { Job, Queue, Worker, type QueueOptions, type WorkerOptions } from 'bullmq';
 import type { LiteralUnion } from 'type-fest';
 
@@ -23,6 +23,7 @@ export const CatalogGetQueueOptions: QueueOptions = {
       delay: 3000,
     },
     removeOnComplete: true,
+    removeOnFail: true,
   },
 };
 
@@ -30,5 +31,5 @@ export class CatalogGetWorker extends Worker<CatalogGetJobInput, CatalogGetJobOu
 export const CatalogGetWorkerOptions: WorkerOptions = {
   prefix: 'bestbuy',
   limiter: { duration: seconds(1), max: 1 },
-  concurrency: 2,
+  concurrency: 5,
 };

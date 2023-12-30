@@ -1,3 +1,4 @@
+import { BestbuySdkHTTPError } from '@bestbuy/sdk';
 import {
   CatalogImagesMergeCommand,
   CatalogOffersMergeCommand,
@@ -57,7 +58,9 @@ export class CatalogGetProcessor extends WorkerHost<
 
     try {
       const data = await this.bestbuy.product.search(`sku=${job.data.sku}`);
+
       const product = data.products.at(0);
+      console.log(product?.sku);
       if (!product) {
         await this.database
           .updateTable('catalog')
@@ -199,7 +202,9 @@ export class CatalogGetProcessor extends WorkerHost<
         }
       }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof BestbuySdkHTTPError) {
+        this.#logger.error(error);
+      } else if (error instanceof Error) {
         throw new UnrecoverableError(error.message);
       } else {
         throw error;
