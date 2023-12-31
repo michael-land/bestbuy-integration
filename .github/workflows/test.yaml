@@ -22,6 +22,7 @@ jobs:
           node-version-file: package.json
           cache: 'pnpm'
           registry-url: 'https://npm.pkg.github.com'
+          scope: '@byteroam'
 
       - name: Install
         run: pnpm install
