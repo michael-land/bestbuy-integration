@@ -130,36 +130,47 @@ export class CatalogGetProcessor extends WorkerHost<
             .where('condition', '=', 'NEW')
             .execute();
 
-          const nextCatalogOffers: Insertable<DB['catalogOffer']>[] =
-            product.inStoreAvailability || product.onlineAvailability
-              ? [
-                  {
-                    // immutable
-                    catalogId: prevCatalog.id,
-                    condition: 'NEW',
-                    createdAt: new Date(),
-                    customerType: 'CONSUMER',
-                    fulfillmentChannel: 'PLATFORM',
-                    fulfillmentCountry: 'USA',
-                    fulfillmentHourMax: null,
-                    fulfillmentHourMin: null,
-                    fulfillmentProvince: null,
-                    merchantId: 'ac0cb587-8525-4161-a635-d67b268eba94',
-                    position: 0,
-                    prime: 'NONE',
-                    restockAt: null,
-                    subcondition: 'NEW',
-                    type: 'REGULAR',
-                    updatedAt: new Date(),
+          const nextCatalogOffers: Insertable<DB['catalogOffer']>[] = [];
+          const nextCatalogOffer: Omit<Insertable<DB['catalogOffer']>, 'fulfillmentType'> = {
+            // immutable
+            catalogId: prevCatalog.id,
+            condition: 'NEW',
+            createdAt: new Date(),
+            customerType: 'CONSUMER',
+            fulfillmentChannel: 'PLATFORM',
+            fulfillmentCountry: 'USA',
+            fulfillmentHourMax: null,
+            fulfillmentHourMin: null,
+            fulfillmentProvince: null,
+            merchantId: 'ac0cb587-8525-4161-a635-d67b268eba94',
+            position: 0,
+            prime: 'NONE',
+            restockAt: null,
+            subcondition: 'NEW',
+            type: 'REGULAR',
+            updatedAt: new Date(),
 
-                    // updatable
-                    itemPrice: new Decimal(product.salePrice ?? product.regularPrice).times(100).round().toNumber(),
-                    shipPrice: product.shippingLevelsOfService.length
-                      ? new Decimal(product.shippingCost ?? 0).times(100).round().toNumber()
-                      : 0,
-                  },
-                ]
-              : [];
+            // updatable
+            itemPrice: new Decimal(product.regularPrice).times(100).round().toNumber(),
+            salePrice: new Decimal(product.salePrice).times(100).round().toNumber(),
+            quantityMin: 1,
+            quantityMax: product.quantityLimit ?? null,
+            fulfillmentCost: product.shippingLevelsOfService.length
+              ? new Decimal(product.shippingCost ?? 0).times(100).round().toNumber()
+              : 0,
+          };
+          if (product.inStoreAvailability) {
+            nextCatalogOffers.push({
+              ...nextCatalogOffer,
+              fulfillmentType: 'PICKUP',
+            });
+          }
+          if (product.onlineAvailability) {
+            nextCatalogOffers.push({
+              ...nextCatalogOffer,
+              fulfillmentType: 'SHIPMENT',
+            });
+          }
 
           await new CatalogOffersMergeCommand({
             prevCatalogOffers,

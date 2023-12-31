@@ -1,6 +1,6 @@
 import type { KyInstance } from 'ky';
+import type { LiteralUnion } from 'type-fest';
 import type { BestbuyPaginationResponse, BestbuyRecommendationResponse } from '../types.js';
-
 export class BestbuyProductApi {
   constructor(private readonly http: KyInstance) {}
 
@@ -39,7 +39,7 @@ export interface BestbuyProduct {
   productId: any;
   name: string;
   source: any;
-  type: string;
+  type: 'HardGood' | 'BlackTie' | 'Bundle' | 'Game' | 'Movie' | 'Music' | 'Software';
   startDate: string;
   new: boolean | null;
   active: boolean | null;
@@ -170,8 +170,23 @@ export interface BestbuyProduct {
   manufacturer: string | null;
   modelNumber: string;
   images: Array<{
-    rel: string;
-    unitOfMeasure: string;
+    rel: LiteralUnion<
+      | `Alt_View_Standard_${number}`
+      | `Alt_View_Zoom_${number}`
+      | 'Angle_Standard'
+      | 'Angle_Zoom'
+      | 'Left_Standard'
+      | 'Left_Zoom'
+      | 'Front_Detail'
+      | 'Front_Large'
+      | 'Front_Medium'
+      | 'Front_Standard'
+      | 'Front_Thumbnail'
+      | 'Front_Zoom'
+      | 'Front_Original',
+      string
+    >;
+    unitOfMeasure: LiteralUnion<'pixels', string>;
     width: string | null;
     height: string | null;
     href: string;
@@ -199,7 +214,7 @@ export interface BestbuyProduct {
   mediaCount: string | null;
   monoStereo: string | null;
   studioLive: string | null;
-  condition: string;
+  condition: 'Refurbished' | 'New' | 'Pre-Owned';
   inStorePickup: boolean | null;
   friendsAndFamilyPickup: boolean | null;
   homeDelivery: boolean | null;
@@ -215,7 +230,7 @@ export interface BestbuyProduct {
   percentSavings: string;
   tradeInValue: string;
   height: string | null;
-  orderable: string;
+  orderable: 'SoldOut' | 'Available' | 'SpecialOrder';
   weight: string | null;
   shippingWeight: number;
   width: string | null;

@@ -87,11 +87,11 @@ importers:
         specifier: workspace:*
         version: link:../packages/bestbuy-sdk
       '@byteroam/database':
-        specifier: 0.0.1
-        version: 0.0.1
+        specifier: 0.0.2
+        version: 0.0.2
       '@byteroam/database-schema':
-        specifier: 0.0.1
-        version: 0.0.1
+        specifier: 0.0.2
+        version: 0.0.2
       '@byteroam/utilities':
         specifier: 0.0.2
         version: 0.0.2
@@ -282,8 +282,8 @@ importers:
         specifier: 10.2.69
         version: 10.2.69
       sst:
-        specifier: 2.38.7
-        version: 2.38.7
+        specifier: 2.39.2
+        version: 2.39.2
 
 packages:
 
@@ -2475,19 +2475,19 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@byteroam/database-schema@0.0.1:
-    resolution: {integrity: sha512-2H3KkKL7CrP4jUHltCdoL+mjd1aVbt3HghFnGOl6OqynwVpKzMz+TvlzY7uqQWDs8f3Q47W6tbpYNzXdSQ7eJQ==, tarball: https://npm.pkg.github.com/download/@byteroam/database-schema/0.0.1/874fb35881c4a14d8306cde429f7ab83ea753efe}
+  /@byteroam/database-schema@0.0.2:
+    resolution: {integrity: sha512-5KJwarrdwa+xCdvzsN+f2I7OA5Dzm0rmBYgS7z5fw+VWbzZhEqRjDy9PkyjDgnGJXG4boZHnzKwZIPaeyU72tg==, tarball: https://npm.pkg.github.com/download/@byteroam/database-schema/0.0.2/bd1766d7b4502e82cc0791a6fa9d87663e2dc310}
     engines: {node: 20.x}
     dependencies:
       modern-diacritics: 2.3.1
       zod: 3.22.4
     dev: false
 
-  /@byteroam/database@0.0.1:
-    resolution: {integrity: sha512-UoA6vaZ77Y/HV8XPdPHo9DOAdbjv99HCkhtsSjOFuuWXkDKHl0IVats4Q0cGmh0ReCYCHO+NM+ivtBLOyv9eQA==, tarball: https://npm.pkg.github.com/download/@byteroam/database/0.0.1/ac422c67ade2223efa566f24cedc799d528ef9bd}
+  /@byteroam/database@0.0.2:
+    resolution: {integrity: sha512-ha/XXIA2GZGR0Ub15jQAjSwv5No5kgK/nqLEskm0Tb+mtaRCcmbApefxufNzHMG6q4Td/qLBhY15mN/HVxEp1g==, tarball: https://npm.pkg.github.com/download/@byteroam/database/0.0.2/10ba4bb871f94188b73dfa89a23cd512a3d4f2b3}
     engines: {node: 20.x, pnpm: 8.x}
     dependencies:
-      '@byteroam/database-schema': 0.0.1
+      '@byteroam/database-schema': 0.0.2
       kysely: 0.26.3
       pg: 8.11.3
       pg-cursor: 2.10.3(pg@8.11.3)
@@ -11903,8 +11903,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /sst@2.38.7:
-    resolution: {integrity: sha512-1bwPv/8suQQ5qXybAN1C7oHB7gjA/daRCI0TY/jTjgQn7ebJRvCvsoYtoJsf7q3ToPf1xc5X+yo7p0vyeLvmSA==}
+  /sst@2.39.2:
+    resolution: {integrity: sha512-lWtdSIoaZLa+pNzuwGmfExj6lvRFv6flT0Zrja+jlZt7eMJ8GPMUqFQoX4simkfNaKCDWSgHrQhexuDvFgEDJQ==}
     hasBin: true
     peerDependencies:
       '@sls-next/lambda-at-edge': ^3.7.0
